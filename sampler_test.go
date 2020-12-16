@@ -1,10 +1,12 @@
-package main
+package swagsampler_test
 
 import (
 	"fmt"
 	"testing"
 
 	"github.com/breise/rstack"
+	"github.com/breise/swagsampler"
+
 	"gopkg.in/yaml.v2"
 )
 
@@ -62,7 +64,7 @@ items:
 			if err := yaml.Unmarshal([]byte(inp), &thing); err != nil {
 				t.Fatalf("cannot unmarshal '%s'. Error: %s", inp, err)
 			}
-			got, err := NewSampleBuilder().renderSample(rstack.New().Push("Top"), thing)
+			got, err := swagsampler.NewSampleBuilder().RenderSample(rstack.New().Push("Top"), thing)
 			if err != nil {
 				t.Fatal("cannot mkSample(Top)")
 			}

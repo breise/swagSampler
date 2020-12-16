@@ -1,0 +1,152 @@
+definitions:
+  Category:
+    properties:
+      id:
+        format: int64
+        type: integer
+      name:
+        type: string
+    type: object
+    xml:
+      name: Category
+  Pet:
+    properties:
+      category:
+        properties:
+          id:
+            format: int64
+            type: integer
+          name:
+            type: string
+        type: object
+        xml:
+          name: Category
+      id:
+        format: int64
+        type: integer
+      name:
+        example: doggie
+        type: string
+      photoUrls:
+        items:
+          type: string
+        type: array
+        xml:
+          name: photoUrl
+          wrapped: true
+      status:
+        description: pet status in the store
+        enum:
+        - available
+        - pending
+        - sold
+        type: string
+      tags:
+        items:
+          properties:
+            id:
+              format: int64
+              type: integer
+            name:
+              type: string
+          type: object
+          xml:
+            name: Tag
+        type: array
+        xml:
+          name: tag
+          wrapped: true
+    required:
+    - name
+    - photoUrls
+    type: object
+    xml:
+      name: Pet
+  Tag:
+    properties:
+      id:
+        format: int64
+        type: integer
+      name:
+        type: string
+    type: object
+    xml:
+      name: Tag
+paths:
+  /pet:
+    post:
+      consumes:
+      - application/json
+      - application/xml
+      operationId: addPet
+      parameters:
+      - description: Pet object that needs to be added to the store
+        in: body
+        name: body
+        required: true
+        schema:
+          properties:
+            category:
+              properties:
+                id:
+                  format: int64
+                  type: integer
+                name:
+                  type: string
+              type: object
+              xml:
+                name: Category
+            id:
+              format: int64
+              type: integer
+            name:
+              example: doggie
+              type: string
+            photoUrls:
+              items:
+                type: string
+              type: array
+              xml:
+                name: photoUrl
+                wrapped: true
+            status:
+              description: pet status in the store
+              enum:
+              - available
+              - pending
+              - sold
+              type: string
+            tags:
+              items:
+                properties:
+                  id:
+                    format: int64
+                    type: integer
+                  name:
+                    type: string
+                type: object
+                xml:
+                  name: Tag
+              type: array
+              xml:
+                name: tag
+                wrapped: true
+          required:
+          - name
+          - photoUrls
+          type: object
+          xml:
+            name: Pet
+      produces:
+      - application/json
+      - application/xml
+      responses:
+        405:
+          description: Invalid input
+      security:
+      - petstore_auth:
+        - write:pets
+        - read:pets
+      summary: Add a new pet to the store
+      tags:
+      - pet

@@ -1,4 +1,4 @@
-package main
+package swagsampler
 
 import (
 	"fmt"
@@ -16,11 +16,12 @@ func NewSampleBuilder() *SampleBuilder {
 	return &SampleBuilder{}
 }
 
-func (s *SampleBuilder) renderSample(rs *rstack.RStack, node map[interface{}]interface{}) (interface{}, error) {
+func (s *SampleBuilder) RenderSample(breadcrumbs *rstack.RStack, node map[interface{}]interface{}) (interface{}, error) {
+	// fmt.Printf("breadcrumbs: %s, node: %v\n", breadcrumbs.Join(`/`), node)
 	var rv interface{}
 	tp, ok := node["type"]
 	if !ok {
-		return nil, fmt.Errorf("no 'type' key found in node for %s", rs.Join(`/`))
+		return nil, fmt.Errorf("no 'type' key found in node for %s", breadcrumbs.Join(`/`))
 	}
 	example, haveExample := node["example"]
 	enum, haveEnum := node["enum"]
@@ -33,11 +34,11 @@ func (s *SampleBuilder) renderSample(rs *rstack.RStack, node map[interface{}]int
 		tmp := map[string]interface{}{}
 		properties, ok := node["properties"]
 		if !ok {
-			log.Fatalf("object missing 'properties' key in node for %s", rs.Join(`/`))
+			log.Fatalf("object missing 'properties' key in node for %s", breadcrumbs.Join(`/`))
 		}
 		propertiesMap, ok := properties.(map[interface{}]interface{})
 		if !ok {
-			log.Fatalf("properties is not a map in node for %s!", rs.Join(`/`))
+			log.Fatalf("properties is not a map in node for %s!", breadcrumbs.Join(`/`))
 		}
 		for name, node := range propertiesMap {
 			var err error
@@ -45,24 +46,24 @@ func (s *SampleBuilder) renderSample(rs *rstack.RStack, node map[interface{}]int
 			if !ok {
 				log.Fatalf("cannot cast %s as a string", name)
 			}
-			tmp[nameString], err = s.renderSample(rs.Push(name), node.(map[interface{}]interface{}))
+			tmp[nameString], err = s.RenderSample(breadcrumbs.Push(name), node.(map[interface{}]interface{}))
 			if err != nil {
-				log.Fatalf("cannot mkSample() for %s in node for %s: %s", name, rs.Join(`/`), err)
+				log.Fatalf("cannot mkSample() for %s in node for %s: %s", name, breadcrumbs.Join(`/`), err)
 			}
 		}
 		rv = tmp
 	} else if tp == "array" {
 		items, ok := node["items"]
 		if !ok {
-			log.Fatalf("array missing 'items' key in node for %s", rs.Join(`/`))
+			log.Fatalf("array missing 'items' key in node for %s", breadcrumbs.Join(`/`))
 		}
 		itemsMap, ok := items.(map[interface{}]interface{})
 		if !ok {
-			log.Fatalf("items is not a map in node for %s", rs.Join(`/`))
+			log.Fatalf("items is not a map in node for %s", breadcrumbs.Join(`/`))
 		}
-		thing, err := s.renderSample(rs.Push("0"), itemsMap)
+		thing, err := s.RenderSample(breadcrumbs.Push("0"), itemsMap)
 		if err != nil {
-			return nil, fmt.Errorf("cannot mkSample() in node for %s", rs.Join(`/`))
+			return nil, fmt.Errorf("cannot mkSample() in node for %s", breadcrumbs.Join(`/`))
 		}
 		rv = []interface{}{thing}
 	} else if tp == "integer" {
