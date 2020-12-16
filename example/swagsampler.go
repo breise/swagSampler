@@ -15,7 +15,8 @@ func main() {
 	flag.Parse()
 	endpoint := *endpointP
 	method := *methodP
-	if len(flag.Args()) != 1 {
+	if endpoint == "" || method == "" || len(flag.Args()) != 1 {
+		flag.Usage()
 		log.Fatal("usage: swagSampler -endpoint {endpoint} -method {method} {file path}")
 	}
 	file := flag.Arg(0)
