@@ -29,6 +29,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("cannot open file '%s' for reading: %s", file, err)
 	}
+
 	sampler := swagsampler.New()
 	sample, err := sampler.MkSample(specBytes, endpoint, method)
 	if err != nil {

@@ -26,6 +26,27 @@ type SwagSampler struct {
 	useExample              bool
 }
 
+func (s *SwagSampler) DefaultExclusiveMaximum(x bool) *SwagSampler {
+	s.defaultExclusiveMaximum = x
+	return s
+}
+func (s *SwagSampler) DefaultExclusiveMinimum(x bool) *SwagSampler {
+	s.defaultExclusiveMinimum = x
+	return s
+}
+func (s *SwagSampler) DefaultMaximum(x float64) *SwagSampler   { s.defaultMaximum = x; return s }
+func (s *SwagSampler) DefaultMaxItems(x int) *SwagSampler      { s.defaultMaxItems = x; return s }
+func (s *SwagSampler) DefaultMaxLength(x int) *SwagSampler     { s.defaultMaxLength = x; return s }
+func (s *SwagSampler) DefaultMaxProperties(x int) *SwagSampler { s.defaultMaxProperties = x; return s }
+func (s *SwagSampler) DefaultMinimum(x float64) *SwagSampler   { s.defaultMinimum = x; return s }
+func (s *SwagSampler) DefaultMinItems(x int) *SwagSampler      { s.defaultMinItems = x; return s }
+func (s *SwagSampler) DefaultMinLength(x int) *SwagSampler     { s.defaultMinLength = x; return s }
+func (s *SwagSampler) DefaultMinProperties(x int) *SwagSampler { s.defaultMinProperties = x; return s }
+func (s *SwagSampler) DefaultPattern(x string) *SwagSampler    { s.defaultPattern = x; return s }
+func (s *SwagSampler) DefaultUniqueItems(x bool) *SwagSampler  { s.defaultUniqueItems = x; return s }
+
+func (s *SwagSampler) UseExample(x bool) *SwagSampler { s.useExample = x; return s }
+
 func New() *SwagSampler {
 	return &SwagSampler{
 		defaultMaximum:   float64(math.MaxInt32),
@@ -34,7 +55,6 @@ func New() *SwagSampler {
 		defaultMinLength: 6,
 		defaultMaxLength: 16,
 		defaultPattern:   `[A-Za-z0-9_]`,
-		useExample:       false,
 	}
 }
 
