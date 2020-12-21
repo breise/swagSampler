@@ -23,6 +23,7 @@ type SwagSampler struct {
 	defaultMinProperties    int
 	defaultPattern          string
 	defaultUniqueItems      bool
+	useExample              bool
 }
 
 func New() *SwagSampler {
@@ -33,6 +34,7 @@ func New() *SwagSampler {
 		defaultMinLength: 6,
 		defaultMaxLength: 16,
 		defaultPattern:   `[A-Za-z0-9_]`,
+		useExample:       false,
 	}
 }
 
@@ -114,11 +116,14 @@ func (s *SwagSampler) RenderSample(breadcrumbs *rstack.RStack, node map[interfac
 	// minProperties, haveMinProperties := node["minProperties"]
 	// uniqueItems, haveUniqueItems := node["uniqueItems"]
 
-	if haveExample {
+	if s.useExample && haveExample {
 		rv = example
 	} else if haveEnum {
-		enumSlice := enum.([]interface{})
-		rv = enumSlice[0]
+		var err error
+		rv, err = genEnum(enum)
+		if err != nil {
+			return nil, fmt.Errorf("in node for %s, cannot genEnum(): %s", breadcrumbs.Join(`/`), err)
+		}
 	} else if havePattern {
 		var err error
 		var pat string

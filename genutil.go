@@ -167,3 +167,13 @@ func (s *SwagSampler) genFloat64(node map[interface{}]interface{}) (float64, err
 	x, err := s.genFloat32(node)
 	return float64(x), err
 }
+
+func genEnum(enum interface{}) (interface{}, error) {
+	enumSlice, ok := enum.([]interface{})
+	if !ok {
+		return nil, fmt.Errorf("cannot cast enum to slice of interface{}: %v", enum)
+	}
+	n := len(enumSlice)
+	i := randgen.Int31n(int32(n))
+	return enumSlice[i], nil
+}
