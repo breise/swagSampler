@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+
 	"github.com/breise/swagsampler"
 )
 
@@ -28,8 +29,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("cannot open file '%s' for reading: %s", file, err)
 	}
-
-	sample, err := swagsampler.MkSample(specBytes, endpoint, method)
+	sampler := swagsampler.New()
+	sample, err := sampler.MkSample(specBytes, endpoint, method)
 	if err != nil {
 		log.Fatal(err)
 	}
