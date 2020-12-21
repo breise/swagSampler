@@ -54,7 +54,7 @@ func New() *SwagSampler {
 		defaultMaxItems:  2,
 		defaultMinLength: 6,
 		defaultMaxLength: 16,
-		defaultPattern:   `[A-Za-z0-9_]`,
+		// defaultPattern:   `[A-Za-z0-9_]`,
 	}
 }
 

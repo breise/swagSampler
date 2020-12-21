@@ -25,7 +25,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("cannot open file '%s' for reading: %s", file, err)
 	}
-	sampler := swagsampler.New().UseExample(true)
+	sampler := swagsampler.New().
+		UseExample(true).
+		DefaultPattern("^[A-Z][a-z]{4,9}$")
 	sample, err := sampler.MkSample(specBytes, endpoint, method)
 	if err != nil {
 		log.Fatal(err)

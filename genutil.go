@@ -47,8 +47,8 @@ func (s *SwagSampler) genString(node map[interface{}]interface{}) (string, error
 		}
 	}
 	if s.defaultPattern != "" {
-		pat := fmt.Sprintf("%s{%d,%d}", s.defaultPattern, minLen, maxLen)
-		return genSampleFromPattern(pat)
+		// pat := fmt.Sprintf("%s{%d,%d}", s.defaultPattern, minLen, maxLen)
+		return genSampleFromPattern(s.defaultPattern)
 	}
 	// determine length
 	rangeSize := 1 + maxLen - minLen
