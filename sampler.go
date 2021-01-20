@@ -115,9 +115,20 @@ func (s *SwagSampler) MkSample(specBytes []byte, endpoint string, method string)
 func (s *SwagSampler) RenderSample(breadcrumbs *rstack.RStack, node map[interface{}]interface{}) (interface{}, error) {
 	// fmt.Printf("breadcrumbs: %s, node: %v\n", breadcrumbs.Join(`/`), node)
 	var rv interface{}
-	tp, ok := node["type"]
-	if !ok {
-		return nil, fmt.Errorf("no 'type' key found in node for %s", breadcrumbs.Join(`/`))
+	tp, haveTp := node["type"]
+	_, havePr := node["properties"]
+	if !haveTp && !havePr {
+		return nil, fmt.Errorf("neither 'type' nor 'properties' key found in node for %s", breadcrumbs.Join(`/`))
+	} else if !haveTp && havePr {
+		// The presence of the 'properties' key implies that this is an "object"
+		tp = "object"
+	} else if haveTp && !havePr {
+		// an "object" with no 'properties' key?  Is this an error?  What does it mean?
+	} else if haveTp && havePr {
+		// both are specified. tp better be "object"
+		if tp != "object" {
+			return nil, fmt.Errorf("'properties' key is present, but type is '%s'; expecting 'object' in node for %s", tp, breadcrumbs.Join(`/`))
+		}
 	}
 
 	pattern, havePattern := node["pattern"]

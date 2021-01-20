@@ -644,7 +644,6 @@ definitions:
     xml:
       name: Tag
   Pet:
-    type: object
     required:
     - name
     - photoUrls
