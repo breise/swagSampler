@@ -24,6 +24,8 @@ type SwagSampler struct {
 	defaultPattern          string
 	defaultUniqueItems      bool
 	useExample              bool
+	useEnumByIndex          bool
+	useEnumAtIndex				  int
 }
 
 func (s *SwagSampler) DefaultExclusiveMaximum(x bool) *SwagSampler {
@@ -46,6 +48,8 @@ func (s *SwagSampler) DefaultPattern(x string) *SwagSampler    { s.defaultPatter
 func (s *SwagSampler) DefaultUniqueItems(x bool) *SwagSampler  { s.defaultUniqueItems = x; return s }
 
 func (s *SwagSampler) UseExample(x bool) *SwagSampler { s.useExample = x; return s }
+func (s *SwagSampler) UseEnumByIndex(x bool) *SwagSampler { s.useEnumByIndex = x; return s }
+func (s *SwagSampler) UseEnumAtIndex(x int) *SwagSampler { s.useEnumAtIndex = x; return s }
 
 func New() *SwagSampler {
 	return &SwagSampler{
@@ -147,11 +151,17 @@ func (s *SwagSampler) RenderSample(breadcrumbs *rstack.RStack, node map[interfac
 	// minProperties, haveMinProperties := node["minProperties"]
 	// uniqueItems, haveUniqueItems := node["uniqueItems"]
 
-	if s.useExample && haveExample {
+	if s.useEnumByIndex && haveEnum {
+		var err error
+		rv, err = genEnum(enum, s.useEnumByIndex, s.useEnumAtIndex)
+		if err != nil {
+			return nil, fmt.Errorf("in node for %s, cannot genEnum(): %s", breadcrumbs.Join(`/`), err)
+		}
+	} else if s.useExample && haveExample {
 		rv = example
 	} else if haveEnum {
 		var err error
-		rv, err = genEnum(enum)
+		rv, err = genEnum(enum, s.useEnumByIndex, s.useEnumAtIndex)
 		if err != nil {
 			return nil, fmt.Errorf("in node for %s, cannot genEnum(): %s", breadcrumbs.Join(`/`), err)
 		}

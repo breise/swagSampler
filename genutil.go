@@ -8,8 +8,8 @@ import (
 	goregen "github.com/zach-klippenstein/goregen"
 )
 
-var asciiMinChar = int32(' ')
-var asciiMaxChar = int32('~')
+var asciiMinChar = int(' ')
+var asciiMaxChar = int('~')
 var asciiRangeSize = 1 + asciiMaxChar - asciiMinChar
 
 var randSource = rand.NewSource(time.Now().UnixNano())
@@ -52,17 +52,17 @@ func (s *SwagSampler) genString(node map[interface{}]interface{}) (string, error
 	}
 	// determine length
 	rangeSize := 1 + maxLen - minLen
-	len := randgen.Int31n(int32(rangeSize)) + int32(minLen)
+	len := randgen.Intn(rangeSize) + minLen
 	// make a string of len pseudorandom printable ascii characters
 	rv := make([]byte, len)
-	for i := int32(0); i < len; i++ {
-		rv[i] = byte(randgen.Int31n(asciiRangeSize) + asciiMinChar)
+	for i := 0; i < len; i++ {
+		rv[i] = byte(randgen.Intn(asciiRangeSize) + asciiMinChar)
 	}
 	return string(rv), nil
 }
 
 func genBool() bool {
-	n := randgen.Int31n(2) // 0 or 1
+	n := randgen.Intn(2) // 0 or 1
 	return n > 0
 }
 
@@ -105,7 +105,7 @@ func (s *SwagSampler) genInt(node map[interface{}]interface{}) (int, error) {
 			max++
 		}
 	}
-	return int(randgen.Int31n(int32(max))) + min, nil
+	return int(randgen.Intn(max)) + min, nil
 }
 
 // Being lazy
@@ -168,12 +168,17 @@ func (s *SwagSampler) genFloat64(node map[interface{}]interface{}) (float64, err
 	return float64(x), err
 }
 
-func genEnum(enum interface{}) (interface{}, error) {
+func genEnum(enum interface{}, useEnumByIndex bool, useEnumAtIndex int) (interface{}, error) {
 	enumSlice, ok := enum.([]interface{})
 	if !ok {
 		return nil, fmt.Errorf("cannot cast enum to slice of interface{}: %v", enum)
 	}
 	n := len(enumSlice)
-	i := randgen.Int31n(int32(n))
+	var i int
+	if useEnumByIndex {
+		i = useEnumAtIndex % n
+	} else {
+		i = randgen.Intn(n)
+	}
 	return enumSlice[i], nil
 }
