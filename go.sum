@@ -1,3 +1,7 @@
+github.com/breise/lrumap v0.2.0 h1:cebZPEKtoPjBOMyRA3IkGKIG3P98AITKgPX3GqaYHQc=
+github.com/breise/lrumap v0.2.0/go.mod h1:gJ61oCcD6WmqdtTnLDcZdDoYLDgVsejD3eSnqrP/sVM=
+github.com/breise/lrumap v0.3.0 h1:ULjcjEUrzYc/Su+6PuFi/2WOnY/ac8r5KZR42iYMCd4=
+github.com/breise/lrumap v0.3.0/go.mod h1:gJ61oCcD6WmqdtTnLDcZdDoYLDgVsejD3eSnqrP/sVM=
 github.com/breise/rstack v0.1.1 h1:6j9OAlFkq6kCehiaQHmKtH7v271DulIyfpNnZF7lXOI=
 github.com/breise/rstack v0.1.1/go.mod h1:jQyp/+fVG+d511Uvs8ytcsmUuVCMs2Rm0EZv1dRJg3s=
 github.com/breise/swagexpander v0.0.0-20201215134511-b1529d1ac0d3 h1:7BHLNXYyp+yx4+1VljGnMThG4ptmyiZ6nvulLYmUcNE=

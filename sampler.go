@@ -5,10 +5,24 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/breise/lrumap/lrumap"
 	"github.com/breise/rstack"
 	"github.com/breise/swagexpander"
 	"gopkg.in/yaml.v2"
 )
+
+var (
+	useGlobalCache = true
+	cache          = lrumap.New().MaxItems(10)
+)
+
+func SetMaxCacheItems(x int) {
+	cache.MaxItems(x)
+}
+
+func UseGlobalCache(x bool) {
+	useGlobalCache = x
+}
 
 type SwagSampler struct {
 	defaultExclusiveMaximum bool
@@ -25,7 +39,26 @@ type SwagSampler struct {
 	defaultUniqueItems      bool
 	useExample              bool
 	useEnumByIndex          bool
-	useEnumAtIndex				  int
+	useEnumAtIndex          int
+}
+
+type SwagSampler2Cache struct {
+	defaultExclusiveMaximum bool
+	defaultExclusiveMinimum bool
+	defaultMaximum          float64
+	defaultMaxItems         int
+	defaultMaxLength        int
+	defaultMaxProperties    int
+	defaultMinimum          float64
+	defaultMinItems         int
+	defaultMinLength        int
+	defaultMinProperties    int
+	defaultPattern          string
+	defaultUniqueItems      bool
+	useExample              bool
+	useEnumByIndex          bool
+	useEnumAtIndex          int
+	specBytes               string
 }
 
 func (s *SwagSampler) DefaultExclusiveMaximum(x bool) *SwagSampler {
@@ -47,9 +80,9 @@ func (s *SwagSampler) DefaultMinProperties(x int) *SwagSampler { s.defaultMinPro
 func (s *SwagSampler) DefaultPattern(x string) *SwagSampler    { s.defaultPattern = x; return s }
 func (s *SwagSampler) DefaultUniqueItems(x bool) *SwagSampler  { s.defaultUniqueItems = x; return s }
 
-func (s *SwagSampler) UseExample(x bool) *SwagSampler { s.useExample = x; return s }
+func (s *SwagSampler) UseExample(x bool) *SwagSampler     { s.useExample = x; return s }
 func (s *SwagSampler) UseEnumByIndex(x bool) *SwagSampler { s.useEnumByIndex = x; return s }
-func (s *SwagSampler) UseEnumAtIndex(x int) *SwagSampler { s.useEnumAtIndex = x; return s }
+func (s *SwagSampler) UseEnumAtIndex(x int) *SwagSampler  { s.useEnumAtIndex = x; return s }
 
 func New() *SwagSampler {
 	return &SwagSampler{
@@ -63,6 +96,46 @@ func New() *SwagSampler {
 }
 
 func (s *SwagSampler) MkSample(specBytes []byte, endpoint string, method string) (interface{}, error) {
+	if !useGlobalCache {
+		answer, err := s.MkSampleNoCache(specBytes, endpoint, method)
+		if err != nil {
+			return nil, err
+		}
+		return answer, nil
+	}
+
+	// using global cache
+	// specString := fmt.Sprintf("%s", specBytes)
+	cacheKey := SwagSampler2Cache{
+		defaultExclusiveMaximum: s.defaultExclusiveMaximum,
+		defaultExclusiveMinimum: s.defaultExclusiveMinimum,
+		defaultMaximum:          s.defaultMaximum,
+		defaultMaxItems:         s.defaultMaxItems,
+		defaultMaxLength:        s.defaultMaxLength,
+		defaultMaxProperties:    s.defaultMaxProperties,
+		defaultMinimum:          s.defaultMinimum,
+		defaultMinItems:         s.defaultMinItems,
+		defaultMinLength:        s.defaultMinLength,
+		defaultMinProperties:    s.defaultMinProperties,
+		defaultPattern:          s.defaultPattern,
+		defaultUniqueItems:      s.defaultUniqueItems,
+		useExample:              s.useExample,
+		useEnumByIndex:          s.useEnumByIndex,
+		useEnumAtIndex:          s.useEnumAtIndex,
+		specBytes:               string(specBytes),
+	}
+	if got, ok := cache.Gegt(cacheKey); ok {
+		return got, nil
+	}
+	answer, err := s.MkSampleNoCache(specBytes, endpoint, method)
+	if err != nil {
+		return nil, err
+	}
+	cache.Put(cacheKey, answer)
+	return answer, nil
+}
+
+func (s *SwagSampler) MkSampleNoCache(specBytes []byte, endpoint string, method string) (interface{}, error) {
 	var spec interface{}
 	if err := yaml.Unmarshal(specBytes, &spec); err != nil {
 		return nil, fmt.Errorf("cannot unmarshal expanded spec: %s", err)
